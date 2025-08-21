@@ -1,5 +1,11 @@
-import pika, datetime, json
+import pika, datetime, json, os
+import boto3
 
+# boto3 resource for dynamodb
+db = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
+subscribers = db.Table('subscribers')
+
+# connect to rabbitmq
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 
@@ -7,8 +13,9 @@ channel.exchange_declare('newsletter', 'topic', durable=True)
 
 date = datetime.date.today().isoformat()
 
-# mock email list
-emails = ['jeff@gmail.com', 'me@yahoo.com', 'aaaa@123.edu']
+# email list
+emails = [item for item in subscribers.scan()['Items']]
+emails = [e['email'] for e in emails]
 
 for email in emails:
     channel.basic_publish(

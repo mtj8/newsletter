@@ -1,11 +1,13 @@
-import pika, json
+import pika, json, os
 from smtplib import SMTP
 from email.mime.text import MIMEText
 
-SMTP_SERVER = 'localhost'
-SMTP_PORT = 1025
+SMTP_SERVER = os.getenv('SMTP_HOST', 'localhost')
+SMTP_PORT = os.getenv('SMTP_PORT', 1025)
 
-FROM_EMAIL = 'newsletter@localhost'
+FROM_EMAIL = os.getenv('FROM_EMAIL', 'mattjoshuatan@gmail.com')
+
+RABBIT_MQ_URL = os.getenv('RABBIT_MQ_URL', 'amqp://localhost')
 
 def send_mail(to, subject, html):
     print(f"Sending email to {to} with subject '{subject}'")
